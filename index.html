@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tic Tac Throne</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--text:#1d1d1b;--muted:#6b6a65;--line:#d9d6cc;--x:#d9480f;--o:#1971c2;--hl:#fff3bf;--ok:#e6f4ea;--hole:#2b2540;--red:#c1272d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--card:#222221;--text:#f0efe9;--muted:#a3a29b;--line:#3a3a37;--x:#ff8a5c;--o:#74b7ff;--hl:#4a4320;--ok:#1f3326;--hole:#0c0a14;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161615;--card:#222221;--text:#f0efe9;--muted:#a3a29b;--line:#3a3a37;--x:#ff8a5c;--o:#74b7ff;--hl:#4a4320;--ok:#1f3326;--hole:#0c0a14;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.serif{font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif}
+.scr{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px 16px;color:#f4ead5;background:repeating-radial-gradient(circle at 50% 100%,#1f1a2b 0 14px,#262035 15px 16px),#1a1416}
+#menu{background:radial-gradient(circle at 50% 28%,#c1272d 0 70px,transparent 71px),repeating-radial-gradient(circle at 50% 100%,#1f1a2b 0 14px,#262035 15px 16px),#1a1416}
+.box{max-width:380px;width:100%}
+#menu .box{margin-top:60px}
+.kanji{font-size:3.2rem;letter-spacing:.3em;margin:0 0 0 .3em;text-shadow:0 2px 12px #000a}
+.scr h1{font-size:2.1rem;margin:8px 0 2px;letter-spacing:.04em}
+.scr h2{font-size:1.5rem;margin:0 0 12px;color:#d4a64a}
+.jp{color:#d4a64a;letter-spacing:.35em;font-size:.85rem;margin-bottom:28px}
+.hanko{display:inline-block;background:var(--red);color:#f4ead5;width:42px;height:42px;line-height:42px;border-radius:6px;font-size:1.4rem;transform:rotate(-6deg);margin-bottom:6px}
+.mbtn{display:block;width:100%;margin:10px 0;padding:13px;border:2px solid #d4a64a;background:#1a1416cc;color:#f4ead5;border-radius:4px;font-size:1.05rem;letter-spacing:.12em;cursor:pointer}
+.mbtn.main{background:var(--red);border-color:var(--red)}
+.rules{text-align:left;background:#1a1416ee;border:1px solid #d4a64a;border-radius:4px;padding:6px 14px;font-size:.86rem;line-height:1.5;color:#e6dcc3;margin-bottom:12px}
+.rules p{margin:8px 0}.rules b{color:#f4ead5}
+.fld{text-align:left;margin:12px 0}
+.fld label{display:block;font-size:.9rem;margin-bottom:4px;color:#d4a64a}
+.fld input{width:100%;padding:11px;border-radius:4px;border:2px solid #d4a64a;background:#120e10;color:#f4ead5;font-size:1rem;font-family:inherit}
+#game{max-width:760px;margin:0 auto;padding:16px 12px;text-align:center;border-top:4px solid var(--red)}
+#game h1{font-size:1.4rem;margin:2px 0 4px}
+#status{min-height:3.2em;margin:6px 0 10px;font-weight:600;line-height:1.35}
+.arena{display:grid;grid-template-columns:minmax(58px,1fr) 3fr minmax(58px,1fr);gap:8px;align-items:start}
+.side{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 4px;min-height:100%}
+.side.on{border-color:currentColor}
+.side h2{font-size:.78rem;margin:0;font-weight:700;word-break:break-word}
+.tro{min-height:1.6em;font-size:1rem;margin:4px 0 2px;line-height:1.2;word-break:break-all}
+.pc{font-size:.68rem;color:var(--muted);margin-bottom:6px}
+.sx{color:var(--x)}.so{color:var(--o)}
+.hand{display:flex;flex-direction:column;gap:6px}
+.card{border:2px solid var(--line);background:var(--bg);color:var(--text);border-radius:8px;padding:5px 2px;font-size:1.3rem;cursor:pointer;font-family:inherit;line-height:1.1}
+.card small{display:block;font-size:.58rem;color:var(--muted)}
+.card.active{border-color:var(--text);background:var(--hl)}
+.card:disabled{opacity:.4;cursor:default}
+.empty{color:var(--muted);font-size:.7rem}
+#board{display:grid;gap:6px;background:var(--line);padding:6px;border-radius:14px;width:100%}
+.cell{background:var(--card);border:none;border-radius:8px;font-size:var(--f);font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);position:relative;font-family:inherit;min-width:0}
+.cell.X{color:var(--x)}.cell.O{color:var(--o)}
+.cell.pick{background:var(--hl)}
+.cell.sel{outline:4px solid currentColor;outline-offset:-4px}
+.cell.target{background:var(--ok)}
+.cell.block{opacity:.45;cursor:not-allowed}
+.cell.block::before{content:"⛔";font-size:1rem}
+.cell.hole{background:var(--hole);cursor:not-allowed;font-size:1.5rem}
+.cell.target:not(.X):not(.O):not(.hole)::before{content:"";width:34%;height:34%;max-width:16px;max-height:16px;border-radius:50%;background:var(--muted);opacity:.5}
+.badge{position:absolute;top:2px;right:3px;font-size:.8rem;color:#fff}
+.cell.win{background:var(--hl);animation:p .6s ease 3}
+@keyframes p{50%{transform:scale(1.08)}}
+#info{margin:12px auto 0;max-width:460px;min-height:3em;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.9rem;line-height:1.4}
+#info.on{border-color:var(--red)}
+.acts{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+button.btn{margin:12px 4px 0;padding:10px 20px;border-radius:8px;border:none;background:var(--text);color:var(--bg);font-size:.95rem;font-weight:600;cursor:pointer;font-family:inherit}
+button.btn:disabled{opacity:.35;cursor:default}
+button.btn.alt{background:var(--card);color:var(--text);border:2px solid var(--line)}
+button.btn.red{background:var(--red);color:#fff;margin:8px 0 0}
+.wm{position:fixed;left:0;bottom:0;z-index:50;padding:5px 10px;padding-bottom:calc(5px + env(safe-area-inset-bottom,0px));font-size:.7rem;color:var(--muted);background:var(--card);border:1px solid var(--line);border-left:none;border-bottom:none;border-radius:0 8px 0 0;opacity:.85;pointer-events:none;user-select:none}
+</style>
+</head>
+<body>
+<div class="wm">game made by : krazzz</div>
+<section class="scr" id="menu">
+<div class="box">
+<div class="hanko serif">王</div>
+<div class="kanji serif">王座</div>
+<h1 class="serif">Tic Tac Throne</h1>
+<div class="jp serif">三目並べ</div>
+<button class="mbtn main serif" id="bplay">Main</button>
+<button class="mbtn serif" id="brules">Aturan</button>
+</div>
+</section>
+
+<section class="scr" id="rulesPage" hidden>
+<div class="box">
+<h2 class="serif">Aturan</h2>
+<div class="rules">
+<p><b>Tujuan:</b> susun 3 pionmu berurutan (lurus atau diagonal) untuk merebut takhta dan mendapat 🏆.</p>
+<p><b>Fase menaruh:</b> bergantian taruh pion di kotak kosong. Tiap pemain punya 3 pion.</p>
+<p><b>Fase geser:</b> kalau semua pionmu sudah di papan, tiap giliran geser 1 pion ke kotak kosong di sebelahnya (diagonal boleh), tidak boleh menimpa pion atau keluar papan.</p>
+<p><b>Syarat menang:</b> sebelum keenam pion turun, dilarang menaruh, menggeser, atau menarik pion yang langsung membentuk 3 berurutan (kotak ditandai ⛔). Kemenangan baru dihitung mulai giliran setelah keenam pion turun, lalu aktif terus, termasuk setelah Nuke.</p>
+<p><b>Giliran:</b> tiap giliran pilih satu, jalan (taruh/geser) atau pakai 1 kartu. Kartu tak terbatas dan didapat acak, 1 kartu tiap 2 giliranmu.</p>
+<p><b>Draw:</b> kalau kamu tidak punya gerakan dan tidak punya kartu yang bisa dimainkan, gilirannya dipakai untuk mengambil 1 kartu.</p>
+<p>🪝 <b>Tarik:</b> pindahkan 1 pion lawan ke kotak kosong di sebelahnya.</p>
+<p>🌿 <b>Vine:</b> kunci 1 pion lawan. Tidak bisa bergerak di 1 giliran, lalu vine hilang.</p>
+<p>🕳️ <b>Blackhole:</b> tutup 1 kotak kosong, tidak bisa dimasuki atau dilewati selama 2 giliran, lalu hilang.</p>
+<p>😇 <b>Angel:</b> di giliranmu berikutnya, pion pilihanmu boleh lompat tepat 2 kotak (lurus atau diagonal) ke kotak kosong, tanpa melewati blackhole.</p>
+<p>🧭 <b>Ruang:</b> tambah 1 baris atau kolom ke atas, bawah, kiri, atau kanan (3x3 jadi 3x4 atau 4x3, maksimal 5x5). Garis menang tetap 3 berurutan.</p>
+<p>💥 <b>Nuke:</b> kembalikan 1 pion lawan ke tangannya, lalu dia bisa menaruhnya lagi. Baru bisa dipakai setelah semua pion pernah turun.</p>
+</div>
+<button class="mbtn serif" id="rback">Kembali</button>
+</div>
+</section>
+
+<section class="scr" id="setup" hidden>
+<div class="box">
+<h2 class="serif">Siapkan Pertarungan</h2>
+<div class="fld"><label for="nameX">✕ Pemain X</label><input id="nameX" maxlength="12" placeholder="X" autocomplete="off"></div>
+<div class="fld"><label for="nameO">◯ Pemain O</label><input id="nameO" maxlength="12" placeholder="O" autocomplete="off"></div>
+<button class="mbtn main serif" id="battle">BATTLE</button>
+<button class="mbtn serif" id="sback">Kembali</button>
+</div>
+</section>
+
+<section id="game" hidden>
+<h1 class="serif">Tic Tac Throne</h1>
+<div id="status"></div>
+<div class="arena">
+<aside class="side sx" id="sx"><h2 id="hxn"></h2><div class="tro" id="nx"></div><div class="pc" id="pcx"></div><div class="hand" id="hx"></div></aside>
+<div><div id="board"></div></div>
+<aside class="side so" id="so"><h2 id="hon"></h2><div class="tro" id="no"></div><div class="pc" id="pco"></div><div class="hand" id="ho"></div></aside>
+</div>
+<div id="info"></div>
+<button class="btn" id="reset">Main lagi</button>
+<button class="btn alt" id="tomenu">Menu</button>
+</section>
+
+<script>
+const NAME=p=>names[p];
+let names={X:"X",O:"O"};
+const CARDS={
+ pull:{n:"Tarik",e:"🪝",d:"Pilih 1 pion lawan, lalu pindahkan ke kotak kosong di sebelahnya. Memakai giliranmu."},
+ vine:{n:"Vine",e:"🌿",d:"Pilih 1 pion lawan untuk dikunci. Tidak bisa bergerak selama 1 giliran, lalu vine hilang. Memakai giliranmu."},
+ hole:{n:"Blackhole",e:"🕳️",d:"Pilih 1 kotak kosong untuk ditutup, tidak bisa dimasuki atau dilewati selama 2 giliran, lalu hilang. Memakai giliranmu."},
+ angel:{n:"Angel",e:"😇",d:"Di giliranmu berikutnya, pion pilihanmu boleh lompat tepat 2 kotak (lurus atau diagonal) ke kotak kosong, tanpa melewati blackhole. Memakai giliranmu sekarang."},
+ ruang:{n:"Ruang",e:"🧭",d:"Tambah 1 baris atau kolom ke arah pilihanmu (maksimal 5x5). Memakai giliranmu."},
+ nuke:{n:"Nuke",e:"💥",d:"Pilih 1 pion lawan di papan, kembalikan ke tangannya agar bisa ditaruh lagi. Baru bisa dipakai setelah semua pion pernah turun. Memakai giliranmu."}
+};
+const KEYS=Object.keys(CARDS),MAX=5;
+let R,C,LINES,b,vine,hole,turn,placed,hand,tc,ang,sel,mode,pullFrom,over,msg,stuck,winLine,armed,warn="",score={X:0,O:0},first="X",cells=[];
+const $=id=>document.getElementById(id);
+const bd=$("board");
+const oth=p=>p==="X"?"O":"X";
+const rc=i=>[i/C|0,i%C];
+const adj=(a,c)=>{if(a===c)return false;const[r1,c1]=rc(a),[r2,c2]=rc(c);return Math.abs(r1-r2)<=1&&Math.abs(c1-c2)<=1};
+const jump=(a,c)=>{const[r1,c1]=rc(a),[r2,c2]=rc(c),dr=Math.abs(r1-r2),dc=Math.abs(c1-c2);return(dr===0||dr===2)&&(dc===0||dc===2)&&dr+dc>0&&!hole[((r1+r2)/2)*C+(c1+c2)/2]};
+const free=i=>!b[i]&&!hole[i];
+const NOLINE="Belum boleh: langkah itu langsung membentuk 3 berurutan sebelum keenam pion turun.";
+const hasLine=()=>LINES.some(l=>b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[1]]===b[l[2]]);
+const risky=ch=>{if(armed)return false;const old=ch.map(([i])=>b[i]);ch.forEach(([i,v])=>b[i]=v);const r=hasLine();ch.forEach(([i],k)=>b[i]=old[k]);return r};
+const canPlace=(p,i)=>free(i)&&!risky([[i,p]]);
+const pullDests=(p,i)=>b[i]!==oth(p)?[]:b.map((v,j)=>j).filter(j=>free(j)&&adj(i,j)&&!risky([[i,""],[j,b[i]]]));
+function buildBoard(){
+ LINES=[];
+ for(let r=0;r<R;r++)for(let c=0;c<C;c++)for(const[dr,dc]of[[0,1],[1,0],[1,1],[1,-1]]){
+  const r2=r+2*dr,c2=c+2*dc;
+  if(r2<R&&c2>=0&&c2<C)LINES.push([0,1,2].map(k=>(r+k*dr)*C+c+k*dc));
+ }
+ bd.innerHTML="";bd.style.gridTemplateColumns="repeat("+C+",1fr)";bd.style.aspectRatio=C+"/"+R;
+ const m=Math.max(R,C);bd.style.setProperty("--f","min("+(10.2/m).toFixed(2)+"rem,"+(26/m).toFixed(1)+"vw)");
+ for(let i=0;i<R*C;i++){const c=document.createElement("button");c.className="cell";c.onclick=()=>click(i);bd.appendChild(c)}
+ cells=[...bd.children];
+}
+function moves(p,raw){const m=[];b.forEach((v,i)=>{if(v===p&&!vine[i])b.forEach((w,j)=>{if(free(j)&&(adj(i,j)||(ang[p]===2&&jump(i,j)))&&(raw||!risky([[i,""],[j,p]])))m.push([i,j])})});return m}
+const hasAction=p=>placed[p]<3?b.some((v,i)=>canPlace(p,i)):moves(p).length>0;
+const pullableBy=(p,i)=>pullDests(p,i).length>0;
+function playable(p,k){
+ const e=oth(p);
+ if(k==="pull")return b.some((v,i)=>pullableBy(p,i));
+ if(k==="vine")return b.some((v,i)=>v===e&&!vine[i]);
+ if(k==="hole")return b.some((v,i)=>free(i));
+ if(k==="ruang")return R<MAX||C<MAX;
+ if(k==="nuke")return armed&&placed[e]>0;
+ return true;
+}
+const anyPlayable=p=>hand[p].some(k=>playable(p,k));
+const randCard=()=>KEYS[Math.random()*KEYS.length|0];
+function init(){
+ R=3;C=3;buildBoard();
+ b=Array(9).fill("");vine=Array(9).fill(0);hole=Array(9).fill(0);
+ turn=first;first=oth(first);placed={X:0,O:0};hand={X:[],O:[]};tc={X:0,O:0};ang={X:0,O:0};
+ over=false;msg="";warn="";stuck=0;winLine=[];armed=false;startTurn();render();
+}
+function startTurn(){
+ tc[turn]++;if(ang[turn]===1)ang[turn]=2;sel=null;mode=null;pullFrom=null;
+ if(tc[turn]%2===0){const k=randCard();hand[turn].push(k);msg+=" "+NAME(turn)+" dapat kartu "+CARDS[k].n+"."}
+ if(!hasAction(turn)&&!anyPlayable(turn)){
+  hand[turn].push(randCard());msg+=" "+NAME(turn)+" tidak bisa beraksi dan mengambil 1 kartu.";
+  tick();endTurn();turn=oth(turn);
+  if(++stuck>8){over=true;msg="Seri, tidak ada yang bisa beraksi.";return}
+  startTurn();
+ }
+}
+function tick(){for(let i=0;i<b.length;i++){if(vine[i])vine[i]--;if(hole[i])hole[i]--}}
+function endTurn(){if(ang[turn]===2)ang[turn]=0}
+function finishTurn(note){
+ stuck=0;warn="";
+ if(armed)for(const p of[turn,oth(turn)]){const w=LINES.find(l=>l.every(k=>b[k]===p));if(w){over=true;winLine=w;score[p]++;msg="🏆 "+NAME(p)+" merebut takhta dan mendapat trofi!";return render()}}
+ if(!armed&&placed.X===3&&placed.O===3)armed=true;
+ tick();endTurn();msg=note||"";turn=oth(turn);startTurn();render();
+}
+function consume(k){hand[turn].splice(hand[turn].indexOf(k),1);mode=null}
+function pickCard(k){if(over)return;warn="";sel=null;pullFrom=null;mode=mode===k?null:k;render()}
+function useAngel(){consume("angel");ang[turn]=1;finishTurn(NAME(turn)+" memakai Angel.")}
+function useRuang(d){
+ consume("ruang");
+ const nR=R+(d==="up"||d==="down"?1:0),nC=C+(d==="left"||d==="right"?1:0),oR=d==="up"?1:0,oC=d==="left"?1:0;
+ const nb=Array(nR*nC).fill(""),nv=Array(nR*nC).fill(0),nh=Array(nR*nC).fill(0);
+ b.forEach((v,i)=>{const[r,c]=rc(i),n=(r+oR)*nC+c+oC;nb[n]=v;nv[n]=vine[i];nh[n]=hole[i]});
+ R=nR;C=nC;b=nb;vine=nv;hole=nh;buildBoard();
+ finishTurn(NAME(turn)+" memperluas ruang menjadi "+R+"x"+C+".");
+}
+function click(i){
+ if(over||mode==="angel"||mode==="ruang")return;
+ warn="";
+ const e=oth(turn);
+ if(mode==="vine"){if(b[i]===e&&!vine[i]){vine[i]=2;consume("vine");finishTurn(NAME(turn)+" mengunci sebuah pion lawan.")}return}
+ if(mode==="hole"){if(free(i)){hole[i]=3;consume("hole");finishTurn(NAME(turn)+" membuka blackhole.")}return}
+ if(mode==="nuke"){if(b[i]===e){b[i]="";vine[i]=0;placed[e]--;consume("nuke");finishTurn(NAME(turn)+" me-nuke pion "+NAME(e)+".")}return}
+ if(mode==="pull"){
+  if(pullFrom===null){if(pullableBy(turn,i)){pullFrom=i;render()}return}
+  if(pullDests(turn,pullFrom).includes(i)){b[i]=b[pullFrom];b[pullFrom]="";vine[i]=vine[pullFrom];vine[pullFrom]=0;consume("pull");finishTurn(NAME(turn)+" menarik pion lawan.")}
+  else if(free(i)&&adj(pullFrom,i)){warn=NOLINE;render()}
+  else if(pullableBy(turn,i)){pullFrom=i;render()}
+  return;
+ }
+ if(placed[turn]<3){if(canPlace(turn,i)){b[i]=turn;placed[turn]++;finishTurn()}else if(free(i)){warn=NOLINE;render()}return}
+ if(b[i]===turn){sel=sel===i?null:i;return render()}
+ if(sel!==null&&moves(turn).some(m=>m[0]===sel&&m[1]===i)){b[i]=turn;b[sel]="";vine[i]=vine[sel];vine[sel]=0;finishTurn()}
+ else if(sel!==null&&moves(turn,true).some(m=>m[0]===sel&&m[1]===i)){warn=NOLINE;render()}
+}
+const tro=n=>n?"🏆".repeat(Math.min(n,4))+(n>4?" ×"+n:""):"–";
+function renderHand(p){
+ const h=$(p==="X"?"hx":"ho");h.innerHTML="";
+ const cnt={};hand[p].forEach(k=>cnt[k]=(cnt[k]||0)+1);
+ KEYS.filter(k=>cnt[k]).forEach(k=>{
+  const e=document.createElement("button");e.className="card"+(p===turn&&mode===k?" active":"");
+  e.disabled=over||p!==turn||!playable(p,k);
+  e.innerHTML=CARDS[k].e+(cnt[k]>1?" ×"+cnt[k]:"")+"<small>"+CARDS[k].n+"</small>";
+  e.onclick=()=>pickCard(k);h.appendChild(e);
+ });
+ if(!hand[p].length)h.innerHTML='<span class="empty">Tanpa kartu</span>';
+}
+function render(){
+ const phase=placed[turn]<3,e=oth(turn);
+ const mv=!over&&!phase&&mode===null?moves(turn):[];
+ cells.forEach((c,i)=>{
+  c.className="cell"+(b[i]?" "+b[i]:"")+(hole[i]?" hole":"");
+  c.innerHTML=hole[i]?"🕳️"+'<span class="badge">'+hole[i]+"</span>":(b[i]==="X"?"✕":b[i]==="O"?"◯":"")+(vine[i]?'<span class="badge">🌿</span>':"");
+  if(over){if(winLine.includes(i))c.classList.add("win");return}
+  let t=false;
+  if(mode==="vine")t=b[i]===e&&!vine[i];
+  else if(mode==="nuke")t=b[i]===e;
+  else if(mode==="hole")t=free(i);
+  else if(mode==="pull")t=pullFrom===null?pullableBy(turn,i):pullDests(turn,pullFrom).includes(i);
+  else if(mode===null&&phase){if(free(i)&&!canPlace(turn,i))c.classList.add("block")}
+  else if(mode===null&&!phase){
+   if(sel===i)c.classList.add("sel");
+   else if(b[i]===turn&&mv.some(m=>m[0]===i))c.classList.add("pick");
+   t=sel!==null&&mv.some(m=>m[0]===sel&&m[1]===i);
+  }
+  if(t)c.classList.add("target");
+  if(mode==="pull"&&pullFrom===i)c.classList.add("sel");
+ });
+ $("hxn").textContent="✕ "+names.X;$("hon").textContent="◯ "+names.O;
+ $("nx").textContent=tro(score.X);$("no").textContent=tro(score.O);
+ $("pcx").textContent="Pion di tangan: "+(3-placed.X);$("pco").textContent="Pion di tangan: "+(3-placed.O);
+ $("sx").classList.toggle("on",!over&&turn==="X");$("so").classList.toggle("on",!over&&turn==="O");
+ let s;
+ if(over)s=msg;
+ else{
+  let a;
+  if(mode==="vine")a="pilih pion lawan yang mau dikunci.";
+  else if(mode==="nuke")a="pilih pion lawan yang mau dikembalikan ke tangannya.";
+  else if(mode==="hole")a="pilih kotak kosong yang mau ditutup.";
+  else if(mode==="angel")a="tekan Pakai Angel untuk mengaktifkan kartu.";
+  else if(mode==="ruang")a="pilih arah perluasan ruang.";
+  else if(mode==="pull")a=pullFrom===null?"pilih pion lawan yang mau ditarik.":"pilih kotak kosong di sebelahnya sebagai tujuan.";
+  else if(!hasAction(turn))a="tidak ada gerakan, pakai kartu.";
+  else a=phase?"taruh pionmu atau pakai kartu.":sel===null?"pilih pion yang mau digeser atau pakai kartu.":"pilih kotak tujuan.";
+  s=(msg?msg.trim()+" ":"")+(warn?warn+" ":"")+NAME(turn)+": "+a+(ang[turn]===2?" Angel aktif, boleh lompat 2 kotak.":"");
+ }
+ $("status").textContent=s;
+ renderHand("X");renderHand("O");
+ const inf=$("info");
+ if(mode&&!over){
+  inf.className="on";
+  inf.innerHTML="<b>"+CARDS[mode].e+" "+CARDS[mode].n+"</b><br>"+CARDS[mode].d;
+  const box=document.createElement("div");box.className="acts";
+  if(mode==="angel"){const u=document.createElement("button");u.className="btn red";u.textContent="Pakai Angel";u.onclick=useAngel;box.appendChild(u)}
+  if(mode==="ruang")[["up","↑ Atas",R>=MAX],["down","↓ Bawah",R>=MAX],["left","← Kiri",C>=MAX],["right","→ Kanan",C>=MAX]].forEach(([d,t,dis])=>{const u=document.createElement("button");u.className="btn red";u.textContent=t;u.disabled=dis;u.onclick=()=>useRuang(d);box.appendChild(u)});
+  inf.appendChild(box);
+ }else{inf.className="";inf.textContent="Tekan kartu untuk melihat penjelasannya.";}
+}
+function show(id){["menu","rulesPage","setup","game"].forEach(s=>$(s).hidden=s!==id);window.scrollTo(0,0)}
+$("bplay").onclick=()=>show("setup");
+$("brules").onclick=()=>show("rulesPage");
+$("rback").onclick=()=>show("menu");
+$("sback").onclick=()=>show("menu");
+$("battle").onclick=()=>{
+ names.X=$("nameX").value.trim().slice(0,12)||"X";
+ names.O=$("nameO").value.trim().slice(0,12)||"O";
+ score={X:0,O:0};first="X";show("game");init();
+};
+$("tomenu").onclick=()=>show("menu");
+$("reset").onclick=init;
+</script>
+</body>
+</html>
